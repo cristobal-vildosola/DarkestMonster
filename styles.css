@@ -1,0 +1,391 @@
+body,
+html {
+  margin: 0;
+  padding: 0;
+  font-family: serif;
+  background-color: #0b0704;
+  color: darkred;
+  overflow: auto;
+}
+* {
+  box-sizing: border-box;
+  outline: none;
+}
+
+/* ------------ forms ------------ */
+button,
+label {
+  width: calc(6 * var(--unit));
+  height: calc(6 * var(--unit));
+  border: 1px solid #fff2;
+  border-radius: calc(3 * var(--unit));
+  padding: 0;
+  background-color: #0b0704;
+
+  font-family: serif;
+  font-size: calc(2.5 * var(--unit));
+  color: #fedfae;
+
+  touch-action: manipulation;
+  cursor: pointer;
+}
+
+body select * {
+  color: #fedfae;
+  font-size: initial;
+}
+.text-button {
+  height: calc(4 * var(--unit));
+  padding: 0 calc(2 * var(--unit));
+  width: auto;
+}
+
+/* remove select caret */
+select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  display: flex;
+  align-items: center;
+  text-align: center;
+  justify-content: center;
+  
+  height: calc(4 * var(--unit));
+  border: 1px solid #fff2;
+  border-radius: calc(2 * var(--unit));
+  padding: 0;
+  background-color: #0b0704;
+
+  font-family: serif;
+  font-size: calc(2.5 * var(--unit));
+  color: #fedfae;
+
+  touch-action: manipulation;
+  cursor: pointer;
+}
+/* for IE10 */
+select::-ms-expand {
+  display: none;
+}
+
+.dual-buttons {
+  position: relative;
+}
+.dual-buttons button {
+  position: absolute;
+  margin: 0;
+  background: #fff2;
+  height: 100%;
+  width: 50%;
+}
+.dual-buttons button:first-child {
+  left: 0;
+  right: 50%;
+  border-radius: 100% 0 0 100% / 50% 0 0 50%;
+}
+.dual-buttons button:last-child {
+  left: 50%;
+  right: 0;
+  border-radius: 0 100% 100% 0 / 0 50% 50% 0;
+}
+
+/* hover states */
+@media (hover: hover) {
+  div select:hover,
+  button:hover,
+  .text-button:hover,
+  .radio-label:hover {
+    background-color: #312b26;
+  }
+
+  .dual-buttons button:hover,
+  .dual-buttons button:hover {
+    background-color: #fff4;
+  }
+}
+
+/* ------------ main ------------ */
+main {
+  height: calc(100 * var(--unit));
+  width: calc(174 * var(--unit));
+  background-image: url(original_img/board.png);
+  background-size: 100%;
+  background-repeat: no-repeat;
+
+  position: relative;
+}
+main > * {
+  position: absolute;
+}
+
+/* ------------ config buttons ------------ */
+.zoom {
+  width: auto;
+  display: flex;
+  top: 1%;
+  left: 1%;
+}
+.zoom button {
+  background-position: center;
+  background-size: 70%;
+  background-repeat: no-repeat;
+}
+.zoom-in {
+  background-image: url(img/icons/zoom_in.svg);
+}
+.zoom-out {
+  margin-left: calc(1 * var(--unit));
+  background-image: url(img/icons/zoom_out.svg);
+}
+
+/* ------------ enemies ------------ */
+.enemies {
+  top: 7%;
+  left: 4.7%;
+  height: 80%;
+  width: 69.8%;
+  display: flex;
+}
+.enemy {
+  flex: 1;
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
+  position: relative;
+}
+.enemy:not(:last-child) {
+  margin-right: 0.4%;
+}
+
+.card {
+  flex: 0 0 63.9%;
+  width: 100%;
+  margin-top: var(--unit);
+  border-radius: var(--unit);
+  background-repeat: no-repeat;
+  position: relative;
+}
+.card:hover .conditions {
+  opacity: 0;
+}
+
+.conditions {
+  display: flex;
+  flex-wrap: wrap;
+}
+.stack {
+  width: calc(7 * var(--unit));
+  height: calc(10 * var(--unit));
+  position: relative;
+}
+.stack .condition {
+  position: absolute;
+  top: 0;
+}
+.stack .condition:nth-child(2) {
+  top: calc(1 * var(--unit));
+}
+.stack .condition:nth-child(3) {
+  top: calc(2 * var(--unit));
+}
+.stack .condition:nth-child(4) {
+  top: calc(3 * var(--unit));
+}
+.stack .condition:nth-child(5) {
+  top: calc(4 * var(--unit));
+}
+.stack .condition:nth-child(6) {
+  top: calc(5 * var(--unit));
+}
+.condition {
+  width: calc(6 * var(--unit));
+  height: calc(6 * var(--unit));
+  border-radius: 100%;
+  background-size: 100%;
+  background-repeat: no-repeat;
+  overflow: hidden;
+  border: 1px solid #fff2;
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+}
+.actions {
+  display: flex;
+  flex-direction: column;
+}
+.actions button {
+  margin-top: var(--unit);
+}
+.life {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: var(--unit);
+}
+.wounds {
+  width: calc(11 * var(--unit));
+  height: calc(11 * var(--unit));
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: red;
+  font-size: calc(3.5 * var(--unit));
+
+  background-image: url(img/tokens/wounds.webp);
+  background-repeat: no-repeat;
+  background-size: 100%;
+  border-radius: 100%;
+  margin-left: calc(1 * var(--unit));
+}
+.wound-5 {
+  width: calc(6 * var(--unit));
+  height: calc(6 * var(--unit));
+  border-radius: 100%;
+  padding: 0;
+  border-color: #8b0000b0;
+  font-size: calc(2.5 * var(--unit));
+  color: red;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+/* ------------ large monsters ------------ */
+.large {
+  flex: 2.02;
+}
+.large .card {
+  flex: 0 0 75%;
+}
+.large .info {
+  flex-direction: row;
+  justify-content: space-evenly;
+  align-self: stretch;
+}
+
+/* ------------ deck ------------ */
+.deck {
+  background: #fff2;
+  top: 36%;
+  left: 78%;
+  height: 51%;
+  width: 17.2%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.deck > *:not(:last-child) {
+  margin-bottom: var(--unit);
+}
+
+/* ------------ overlay ------------ */
+.overlay {
+  z-index: 100;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background-color: #0006;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal {
+  background-color: #0b0704;
+  color: #fedfae;
+  position: relative;
+  padding: calc(4 * var(--unit));
+  border-radius: calc(2 * var(--unit));
+  margin: calc(1 * var(--unit));
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal > *:not(:last-child) {
+  margin-bottom: calc(1 * var(--unit));
+}
+
+.close-modal {
+  position: absolute;
+  top: calc(1 * var(--unit));
+  right: calc(1 * var(--unit));
+  width: calc(3 * var(--unit));
+  height: calc(3 * var(--unit));
+  color: #fedfae;
+  background: #0b0704;
+  font-family: sans-serif;
+  border: 0;
+}
+
+.modal .text {
+  text-align: center;
+  font-size: calc(2.5 * var(--unit));
+  align-self: center;
+}
+.modal hr {
+  flex: 1;
+  margin-top: 0;
+  align-self: center;
+}
+
+.modal-buttons {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: start;
+  width: 45vh;
+  margin-left: -1vh;
+}
+.modal-buttons > * {
+  margin-left: 1vh;
+  margin-bottom: 1vh;
+}
+
+input[type="radio"] {
+  display: none;
+}
+.radio-label {
+  height: 4vh;
+  border-radius: 2vh;
+  padding: 1vh;
+
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(2.5 * var(--unit));
+}
+input[type="radio"]:checked + label {
+  border-color: darkred;
+  box-shadow: 0 0 0.5vh 0.5vh darkred;
+}
+.modal button + button {
+  margin-left: 1vh;
+}
+
+.modal .condition {
+  width: 6vh;
+  height: 6vh;
+  border-radius: 100%;
+}
+.modal button.stack {
+  width: 6vh;
+  height: 11vh;
+  background-color: transparent;
+  border-radius: 3vh;
+  overflow: hidden;
+  border: 0;
+}
