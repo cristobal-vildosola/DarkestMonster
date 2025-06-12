@@ -9,10 +9,10 @@ function baseMonster() {
 createApp({
   data() {
     return {
-      monsters: [{ name: "", ...baseMonster() }],
-      deck: Object.keys(common).map((x) => ({
-        name: x,
-        copies: 3,
+      monsters: [],
+      deck: Object.entries(allMonsters).map(([name, info]) => ({
+        name: name,
+        copies: info.copies,
         spawned: 0,
       })),
 
@@ -20,11 +20,19 @@ createApp({
       condition: "",
       turns: 0,
       editingConditions: 0,
+
       spawning: false,
       monster: "",
 
+      settingDeck: false,
+      zone: "",
+      zonePool: Object.keys(zones),
+      act: 0,
+      editingDeck: false,
+
       conditions: conditions,
-      monstersPool: Object.keys(common),
+      monstersPool: Object.keys(allMonsters),
+      allMonsters: allMonsters,
       zoom: 0.98,
     };
   },
@@ -49,7 +57,7 @@ createApp({
 
   computed: {
     numberSpawned() {
-      return this.monsters.reduce((acc, m) => acc + (m.large ? 2 : 1), 0);
+      return this.monsters.reduce((acc, m) => acc + (allMonsters[m.name].large ? 2 : 1), 0);
     },
     fillers() {
       return 4 - this.numberSpawned;
@@ -61,7 +69,7 @@ createApp({
       };
     },
     opened() {
-      return this.addingConditions || this.editingConditions || this.spawning;
+      return this.addingConditions || this.editingConditions || this.spawning || this.settingDeck || this.editingDeck;
     },
   },
 
@@ -72,8 +80,8 @@ createApp({
       };
     },
     monsterCard(name) {
-      if (!common[name]) return;
-      const card = common[name];
+      if (!allMonsters[name]) return;
+      const card = allMonsters[name];
       return {
         backgroundImage: `url('${card.img}')`,
         backgroundPosition: this.position(card.index, card.x, card.y),
@@ -92,9 +100,7 @@ createApp({
         condition: this.condition,
         turns: this.turns,
       });
-      this.monsters[this.addingConditions - 1].conditions.sort((a, b) =>
-        a.condition < b.condition ? -1 : 1
-      );
+      this.monsters[this.addingConditions - 1].conditions.sort((a, b) => (a.condition < b.condition ? -1 : 1));
     },
     startTurn(i) {
       this.monsters[i].stunned = false;
@@ -128,12 +134,7 @@ createApp({
     spawn() {
       if (this.numberSpawned < 4) {
         const name = this.monster ? this.monster : this.randomMonster();
-        console.log(name);
-        this.monsters.push({
-          name,
-          large: common[name].large,
-          ...baseMonster(),
-        });
+        this.monsters.push({ name, ...baseMonster() });
         this.deck.forEach((x) => (x.spawned += x.name === name ? 1 : 0));
       }
       this.spawning = false;
@@ -141,24 +142,36 @@ createApp({
     },
     randomMonster() {
       const monsters = this.deck
-        .filter(
-          (monster) => !common[monster.name].large || this.numberSpawned <= 2
-        )
-        .reduce(
-          (acc, monster) =>
-            acc.concat(
-              Array(monster.copies - monster.spawned).fill(monster.name)
-            ),
-          []
-        );
-      console.log(monsters);
+        .filter((monster) => !allMonsters[monster.name].large || this.numberSpawned <= 2)
+        .reduce((acc, monster) => acc.concat(Array(monster.copies - monster.spawned).fill(monster.name)), []);
+
+      if (monsters.length == 0) {
+        this.resetDeck();
+        return this.randomMonster();
+      }
+
       return monsters[(Math.random() * (monsters.length - 1)) | 0];
+    },
+
+    setUp() {
+      this.deck = Object.entries({ ...common, ...zones[this.zone] })
+        .filter(([_, info]) => info.level <= this.act)
+        .map(([name, info]) => ({ name: name, copies: info.copies, spawned: 0 }));
+
+      this.zone = "";
+      this.act = 0;
+      this.settingDeck = false;
+    },
+    resetDeck() {
+      this.deck.forEach((m) => (m.spawned = 0));
     },
 
     closeModal() {
       this.addingConditions = 0;
       this.editingConditions = 0;
       this.spawning = false;
+      this.settingDeck = false;
+      this.editingDeck = false;
     },
     saveGame() {
       localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(this.save));
@@ -171,8 +184,7 @@ createApp({
     },
     exportSave() {
       const save = JSON.stringify(this.save, null, 2);
-      const dataStr =
-        "data:text/json;charset=utf-8," + encodeURIComponent(save);
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(save);
       const dlAnchorElem = document.getElementById("export");
       dlAnchorElem.setAttribute("href", dataStr);
       dlAnchorElem.setAttribute("download", `${LOCAL_STORAGE_KEY}.json`);

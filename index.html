@@ -51,7 +51,7 @@
         <div
           v-for="(monster, index) in monsters"
           class="enemy"
-          :class="{large: monster.large}"
+          :class="{large: allMonsters[monster.name].large}"
         >
           <div class="card" :style="monsterCard(monster.name)">
             <div class="conditions">
@@ -104,8 +104,8 @@
       </div>
 
       <div class="deck">
-        <button class="text-button" @click="spawn()">Setup Deck</button>
-        <button class="text-button" @click="spawn()">Edit Deck</button>
+        <button class="text-button" @click="settingDeck = true">Setup Deck</button>
+        <button class="text-button" @click="editingDeck = true">Edit Deck</button>
         <button class="text-button" @click="spawn()">+ Random Monster</button>
         <button class="text-button" @click="spawning = true">
           + Specific Monster
@@ -194,10 +194,45 @@
           </div>
           <button class="text-button" @click="spawn()">Spawn</button>
         </template>
+
+        <template v-else-if="settingDeck">
+          <div class="text">Set up a new deck</div>
+          <div>
+            <span class="text">Area: </span>
+            <select v-model="zone">
+              <option value="" disabled hidden>Select Area</option>
+              <option v-for="item in zonePool" :value="item">
+                {{item}}
+              </option>
+            </select>
+          </div>
+          <div>
+            <span class="text">Act: </span>
+            <select v-model="act">
+              <option value="0" disabled hidden>Select Act</option>
+              <option v-for="item in 3" :value="item">
+                {{item}}
+              </option>
+            </select>
+          </div>
+          <button class="text-button" @click="setUp()">Confirm</button>
+        </template>
+
+        <template v-else-if="editingDeck">
+          <div class="text">Edit your deck</div>
+
+          <button class="text-button" @click="closeModal()">Close</button>
+        </template>
       </div>
     </section>
   </div>
 
-  <script src="constants.js"></script>
+  <script src="constants/common.js"></script>
+  <script src="constants/ruins.js"></script>
+  <script src="constants/crimson.js"></script>
+  <script src="constants/cove.js"></script>
+  <script src="constants/warrens.js"></script>
+  <script src="constants/darkest.js"></script>
+  <script src="constants/constants.js"></script>
   <script src="app.js"></script>
 </body>
