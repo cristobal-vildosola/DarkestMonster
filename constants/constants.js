@@ -17,17 +17,18 @@ const conditions = [
 ];
 
 const allMonsters = {
-  ...common,
   ...ruins,
   ...courtyard,
   ...cove,
   ...warrens,
-  ...darkest,
+  ...common,
+  ...darkest_dungeon,
 };
 const zones = {
   ruins,
   courtyard,
   cove,
   warrens,
-  darkest,
+  common,
+  darkest_dungeon,
 };

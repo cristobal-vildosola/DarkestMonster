@@ -27,11 +27,10 @@ createApp({
 
       editingDeck: false,
       zone: '',
-      zonePool: Object.keys(zones),
+      zonePool: Object.keys(zones).filter((x) => x !== 'common'),
       act: 0,
 
       conditions: conditions,
-      monstersPool: Object.keys(allMonsters),
       allMonsters: allMonsters,
       zoom: 0.98,
     };
@@ -93,6 +92,13 @@ createApp({
       const x = ((index % x_n) * 100) / (x_n - 1);
       const y = y_n == 1 ? 1 : (Math.floor(index / x_n) * 100) / (y_n - 1);
       return `${x}% ${y}%`;
+    },
+
+    format(text) {
+      return text
+        .split('_')
+        .map((t) => t.charAt(0).toUpperCase() + t.slice(1))
+        .join(' ');
     },
 
     addCondition() {
@@ -205,8 +211,8 @@ createApp({
 
     setUp() {
       let monsters = { ...common, ...zones[this.zone] };
-      if (this.zone == 'darkest') {
-        monsters = darkest;
+      if (this.zone == 'darkest_dungeon') {
+        monsters = darkest_dungeon;
         this.level = 3;
       }
 

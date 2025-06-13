@@ -123,8 +123,8 @@
           <div>
             <select id="select-monster" v-model="monster">
               <option value="" disabled hidden>Select Monster</option>
-              <optgroup v-for="(value, key) in zones" :label="key">
-                <option v-for="(_, name) in value" :value="name">{{name}}</option>
+              <optgroup v-for="(value, key) in zones" :label="format(key)">
+                <option v-for="(_, name) in value" :value="name">{{format(name)}}</option>
               </optgroup>
             </select>
           </div>
@@ -133,11 +133,11 @@
 
         <template v-else-if="editingDeck">
           <div class="text">Set up a new deck</div>
-          <div class="setup">
+          <div class="modal-buttons">
             <span class="text">Area: </span>
             <select id="select-zone" v-model="zone">
               <option value="" disabled hidden>Select</option>
-              <option v-for="item in zonePool" :value="item">{{item}}</option>
+              <option v-for="item in zonePool" :value="item">{{format(item)}}</option>
             </select>
 
             <span class="text">Act: </span>
@@ -171,7 +171,7 @@
                   <img :src="`img/banners/${ allMonsters[item.name].zone }.webp`" />
                 </td>
 
-                <td>{{ item.name }} {{ "I".repeat(allMonsters[item.name].level) }}</td>
+                <td>{{ format(item.name) }} {{ "I".repeat(allMonsters[item.name].level) }}</td>
 
                 <td>
                   <select :id="item.name + '-copies'" v-model="item.copies">
@@ -194,7 +194,9 @@
                 <td colspan="2">
                   <select id="select-monster" v-model="monster">
                     <option value="" disabled hidden>Select Monster</option>
-                    <option v-for="item in monstersPool" :value="item">{{item}}</option>
+                    <optgroup v-for="(value, key) in zones" :label="format(key)">
+                      <option v-for="(_, name) in value" :value="name">{{format(name)}}</option>
+                    </optgroup>
                   </select>
                 </td>
                 <td>
