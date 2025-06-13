@@ -1,6 +1,6 @@
 const { createApp } = Vue;
 
-const LOCAL_STORAGE_KEY = "DarkestMonsters";
+const LOCAL_STORAGE_KEY = 'DarkestMonsters';
 
 function baseMonster() {
   return { wounds: 0, conditions: [], stunned: false };
@@ -16,17 +16,17 @@ createApp({
         spawned: 0,
       })),
 
-      addingConditions: 0,
-      condition: "",
-      turns: 0,
       editingConditions: 0,
+      condition: '',
+      turns: 0,
 
       spawning: false,
-      monster: "",
+      zones: zones,
+      monster: '',
       copies: 0,
 
       editingDeck: false,
-      zone: "",
+      zone: '',
       zonePool: Object.keys(zones),
       act: 0,
 
@@ -69,7 +69,7 @@ createApp({
       };
     },
     opened() {
-      return this.addingConditions || this.editingConditions || this.spawning || this.editingDeck;
+      return this.editingConditions || this.spawning || this.editingDeck;
     },
   },
 
@@ -96,13 +96,13 @@ createApp({
     },
 
     addCondition() {
-      const index = this.addingConditions - 1;
+      const index = this.editingConditions - 1;
 
-      if (["push", "pull"].includes(this.condition)) {
+      if (['push', 'pull'].includes(this.condition)) {
         const removed = this.monsters.splice(index, 1);
-        const dest = index + (this.condition == "push" ? this.turns : -this.turns);
+        const dest = index + (this.condition == 'push' ? this.turns : -this.turns);
         this.monsters.splice(dest, 0, ...removed);
-        this.addingConditions = Math.max(Math.min(dest + 1, this.monsters.length), 1);
+        this.editingConditions = Math.max(Math.min(dest + 1, this.monsters.length), 1);
         return;
       }
 
@@ -115,10 +115,10 @@ createApp({
     startTurn(i) {
       this.monsters[i].stunned = false;
       this.monsters[i].conditions.forEach((c) => {
-        if (c.condition.startsWith("bl")) {
+        if (c.condition.startsWith('bl')) {
           this.wound(i, parseInt(c.condition.slice(-1)));
         }
-        if (c.condition == "stun") {
+        if (c.condition == 'stun') {
           this.monsters[i].stunned = true;
         }
       });
@@ -146,7 +146,7 @@ createApp({
         index,
         back = 0,
         front = 0,
-        lastSpawned = "";
+        lastSpawned = '';
 
       while (this.numberSpawned < 4) {
         name = this.randomMonster();
@@ -189,7 +189,7 @@ createApp({
         this.deck.forEach((x) => (x.spawned += x.name === name ? 1 : 0));
       }
       this.spawning = false;
-      this.monster = "";
+      this.monster = '';
     },
     randomMonster() {
       const monsters = this.deck.reduce(
@@ -205,7 +205,7 @@ createApp({
 
     setUp() {
       let monsters = { ...common, ...zones[this.zone] };
-      if (this.zone == "darkest") {
+      if (this.zone == 'darkest') {
         monsters = darkest;
         this.level = 3;
       }
@@ -214,7 +214,7 @@ createApp({
         .filter(([_, info]) => info.level <= this.act)
         .map(([name, info]) => ({ name: name, copies: info.copies, spawned: 0 }));
 
-      this.zone = "";
+      this.zone = '';
       this.act = 0;
     },
     resetDeck() {
@@ -222,7 +222,7 @@ createApp({
     },
     addToDeck() {
       this.deck.push({ name: this.monster, copies: this.copies, spawned: 0 });
-      this.monster = "";
+      this.monster = '';
       this.copies = 0;
     },
     remove(index) {
@@ -231,7 +231,7 @@ createApp({
     removeLevel1() {
       this.deck.forEach((m) => {
         const info = allMonsters[m.name];
-        if (info.level === 1 && !info.large) m.copies -= 1;
+        if (info.level === 1 && !info.large) m.copies = Math.max(1, m.copies - 1);
       });
     },
     resetSpawned() {
@@ -239,7 +239,6 @@ createApp({
     },
 
     closeModal() {
-      this.addingConditions = 0;
       this.editingConditions = 0;
       this.spawning = false;
       this.editingDeck = false;
@@ -255,14 +254,14 @@ createApp({
     },
     exportSave() {
       const save = JSON.stringify(this.save, null, 2);
-      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(save);
-      const dlAnchorElem = document.getElementById("export");
-      dlAnchorElem.setAttribute("href", dataStr);
-      dlAnchorElem.setAttribute("download", `${LOCAL_STORAGE_KEY}.json`);
+      const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(save);
+      const dlAnchorElem = document.getElementById('export');
+      dlAnchorElem.setAttribute('href', dataStr);
+      dlAnchorElem.setAttribute('download', `${LOCAL_STORAGE_KEY}.json`);
       dlAnchorElem.click();
     },
     importSave() {
-      document.getElementById("import").click();
+      document.getElementById('import').click();
     },
     onFileUpload(event) {
       if (!event.target.files[0]) return;
@@ -279,4 +278,4 @@ createApp({
       this.deck = save.deck;
     },
   },
-}).mount("#app");
+}).mount('#app');

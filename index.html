@@ -43,7 +43,6 @@
             <div class="actions">
               <button class="text-button" @click="kill(index)">Remove Monster</button>
               <button class="text-button" @click="editingConditions = index + 1">Edit Conditions</button>
-              <button class="text-button" @click="addingConditions = index + 1">Add Conditions</button>
               <button class="text-button" @click="startTurn(index)">Start Turn</button>
             </div>
             <div class="life">
@@ -74,8 +73,8 @@
       <div class="modal">
         <button class="close-modal" @click="closeModal()">X</button>
 
-        <template v-if="addingConditions">
-          <div class="text">Select Condition</div>
+        <template v-if="editingConditions">
+          <div class="text">Add Condition</div>
           <div class="modal-buttons">
             <template v-for="item in conditions">
               <input type="radio" :id="item" :value="item" v-model="condition" />
@@ -97,9 +96,13 @@
           </div>
 
           <button class="text-button" @click="addCondition()">Add</button>
-        </template>
 
-        <template v-else-if="editingConditions">
+          <div class="text modal-buttons">
+            <hr />
+            <span>Current conditions</span>
+            <hr />
+          </div>
+
           <div class="text">Click a stack to remove it</div>
 
           <div class="modal-buttons">
@@ -112,12 +115,6 @@
               <div v-for="_ in item.turns" class="condition" :style="conditionCard(item.condition)"></div>
             </button>
           </div>
-
-          <div class="text modal-buttons">
-            <hr />
-            <span>OR</span>
-            <hr />
-          </div>
           <button class="text-button" @click="clearConditions()">Clear all conditions</button>
         </template>
 
@@ -126,7 +123,9 @@
           <div>
             <select id="select-monster" v-model="monster">
               <option value="" disabled hidden>Select Monster</option>
-              <option v-for="item in monstersPool" :value="item">{{item}}</option>
+              <optgroup v-for="(value, key) in zones" :label="key">
+                <option v-for="(_, name) in value" :value="name">{{name}}</option>
+              </optgroup>
             </select>
           </div>
           <button class="text-button" @click="spawn()" :disabled="monster == ''">Spawn</button>
@@ -218,7 +217,7 @@
 
   <script src="constants/common.js"></script>
   <script src="constants/ruins.js"></script>
-  <script src="constants/crimson.js"></script>
+  <script src="constants/courtyard.js"></script>
   <script src="constants/cove.js"></script>
   <script src="constants/warrens.js"></script>
   <script src="constants/darkest.js"></script>
