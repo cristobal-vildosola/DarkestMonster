@@ -1,5 +1,5 @@
-const warrensS = { img: "original_img/warrens/warren_monster.jpg", x: 7, y: 5, zone: "warrens" };
-const warrensL = { img: "original_img/warrens/warren_Boss.jpg", x: 4, y: 2, zone: "warrens" };
+const warrensS = { img: "img/warrens/warren_monster.webp", x: 7, y: 5, zone: "warrens" };
+const warrensL = { img: "img/warrens/warren_Boss.webp", x: 4, y: 2, zone: "warrens" };
 
 const warrens = {
   swine_chopper: { level: 1, copies: 3, front: true, large: false, index: 0, ...warrensS },

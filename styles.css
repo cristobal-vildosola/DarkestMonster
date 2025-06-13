@@ -96,7 +96,7 @@ select {
 main {
   height: calc(100 * var(--unit));
   width: calc(174 * var(--unit));
-  background-image: url(original_img/board.png);
+  background-image: url(img/board.webp);
   background-size: 100%;
   background-repeat: no-repeat;
 
