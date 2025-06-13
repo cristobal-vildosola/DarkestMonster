@@ -1,4 +1,3 @@
-
 const conditions = [
   "bleed1",
   "bleed2",
@@ -19,10 +18,13 @@ const conditions = [
 
 const allMonsters = {
   ...common,
+  ...ruins,
+  ...crimson,
   ...cove,
   ...warrens,
-}
+  ...darkest,
+};
 const zones = {
   cove,
   warrens,
-}
+};

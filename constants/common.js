@@ -1,7 +1,7 @@
-const commonS = { img: "original_img/common/monsters.png", x: 10, y: 7 };
-const CommonSFrench = { img: "original_img/common/monstersF.jpg", x: 10, y: 7 };
-const commonL = { img: "original_img/common/big.jpg", x: 2, y: 2 };
-const original = (name) => ({ img: `original_img/common/${name}.jpg`, x: 1, y: 1 });
+const commonS = { img: "original_img/common/monsters.png", x: 10, y: 7, zone: "common" };
+const CommonSFrench = { img: "original_img/common/monstersF.jpg", x: 10, y: 7, zone: "common" };
+const commonL = { img: "original_img/common/big.jpg", x: 2, y: 2, zone: "common" };
+const original = (name) => ({ img: `original_img/common/${name}.jpg`, x: 1, y: 1, zone: "common" });
 
 const common = {
   cultist_brawler: { level: 1, copies: 3, front: true, large: false, index: 18, ...commonS },

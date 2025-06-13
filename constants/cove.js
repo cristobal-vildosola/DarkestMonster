@@ -1,5 +1,5 @@
-const coveS = { img: "original_img/cove/Monsters.png", x: 8, y: 4 };
-const coveL = { img: "original_img/cove/Bosses.png", x: 4, y: 3 };
+const coveS = { img: "original_img/cove/Monsters.png", x: 8, y: 4, zone: "cove" };
+const coveL = { img: "original_img/cove/Bosses.png", x: 4, y: 3, zone: "cove" };
 
 const cove = {
   pelagic_shaman: { level: 1, copies: 3, front: false, large: false, index: 0, ...coveS },

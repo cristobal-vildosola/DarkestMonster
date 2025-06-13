@@ -23,12 +23,12 @@ createApp({
 
       spawning: false,
       monster: "",
+      copies: 0,
 
-      settingDeck: false,
+      editingDeck: false,
       zone: "",
       zonePool: Object.keys(zones),
       act: 0,
-      editingDeck: false,
 
       conditions: conditions,
       monstersPool: Object.keys(allMonsters),
@@ -69,7 +69,7 @@ createApp({
       };
     },
     opened() {
-      return this.addingConditions || this.editingConditions || this.spawning || this.settingDeck || this.editingDeck;
+      return this.addingConditions || this.editingConditions || this.spawning || this.editingDeck;
     },
   },
 
@@ -96,11 +96,21 @@ createApp({
     },
 
     addCondition() {
-      this.monsters[this.addingConditions - 1].conditions.push({
+      const index = this.addingConditions - 1;
+
+      if (["push", "pull"].includes(this.condition)) {
+        const removed = this.monsters.splice(index, 1);
+        const dest = index + (this.condition == "push" ? this.turns : -this.turns);
+        this.monsters.splice(dest, 0, ...removed);
+        this.addingConditions = Math.max(Math.min(dest + 1, this.monsters.length), 1);
+        return;
+      }
+
+      this.monsters[index].conditions.push({
         condition: this.condition,
         turns: this.turns,
       });
-      this.monsters[this.addingConditions - 1].conditions.sort((a, b) => (a.condition < b.condition ? -1 : 1));
+      this.monsters[index].conditions.sort((a, b) => (a.condition < b.condition ? -1 : 1));
     },
     startTurn(i) {
       this.monsters[i].stunned = false;
@@ -131,9 +141,50 @@ createApp({
       this.monsters.splice(i, 1);
     },
 
+    enterRoom() {
+      let name,
+        index,
+        back = 0,
+        front = 0,
+        lastSpawned = "";
+
+      while (this.numberSpawned < 4) {
+        name = this.randomMonster();
+        const monster = { name, ...baseMonster() };
+
+        // remove last small added if necessary
+        if (allMonsters[name].large && this.numberSpawned == 3) {
+          if (allMonsters[lastSpawned].front) {
+            index = this.monsters.findLastIndex((x) => x.name === lastSpawned);
+            front -= 1;
+          } else {
+            index = this.monsters.findIndex((x) => x.name === lastSpawned);
+            back -= 1;
+          }
+          this.monsters.splice(index, 1);
+        }
+
+        if (allMonsters[name].front) {
+          this.monsters.splice(front, 0, monster);
+          front += 1;
+        } else {
+          this.monsters.splice(this.monsters.length - back, 0, monster);
+          back += 1;
+        }
+
+        this.deck.forEach((x) => (x.spawned += x.name === name ? 1 : 0));
+        if (!allMonsters[name].large) lastSpawned = name;
+      }
+    },
     spawn() {
       if (this.numberSpawned < 4) {
-        const name = this.monster ? this.monster : this.randomMonster();
+        let name = this.monster ? this.monster : this.randomMonster();
+
+        // avoid large monsters when no more room available
+        while (!this.monster && allMonsters[name].large && this.numberSpawned > 2) {
+          name = this.randomMonster();
+        }
+
         this.monsters.push({ name, ...baseMonster() });
         this.deck.forEach((x) => (x.spawned += x.name === name ? 1 : 0));
       }
@@ -141,28 +192,49 @@ createApp({
       this.monster = "";
     },
     randomMonster() {
-      const monsters = this.deck
-        .filter((monster) => !allMonsters[monster.name].large || this.numberSpawned <= 2)
-        .reduce((acc, monster) => acc.concat(Array(monster.copies - monster.spawned).fill(monster.name)), []);
-
+      const monsters = this.deck.reduce(
+        (acc, monster) => acc.concat(Array(monster.copies - monster.spawned).fill(monster.name)),
+        []
+      );
       if (monsters.length == 0) {
         this.resetDeck();
         return this.randomMonster();
       }
-
       return monsters[(Math.random() * (monsters.length - 1)) | 0];
     },
 
     setUp() {
-      this.deck = Object.entries({ ...common, ...zones[this.zone] })
+      let monsters = { ...common, ...zones[this.zone] };
+      if (this.zone == "darkest") {
+        monsters = darkest;
+        this.level = 3;
+      }
+
+      this.deck = Object.entries(monsters)
         .filter(([_, info]) => info.level <= this.act)
         .map(([name, info]) => ({ name: name, copies: info.copies, spawned: 0 }));
 
       this.zone = "";
       this.act = 0;
-      this.settingDeck = false;
     },
     resetDeck() {
+      this.deck.forEach((m) => (m.spawned = 0));
+    },
+    addToDeck() {
+      this.deck.push({ name: this.monster, copies: this.copies, spawned: 0 });
+      this.monster = "";
+      this.copies = 0;
+    },
+    remove(index) {
+      this.deck.splice(index, 1);
+    },
+    removeLevel1() {
+      this.deck.forEach((m) => {
+        const info = allMonsters[m.name];
+        if (info.level === 1 && !info.large) m.copies -= 1;
+      });
+    },
+    resetSpawned() {
       this.deck.forEach((m) => (m.spawned = 0));
     },
 
@@ -170,7 +242,6 @@ createApp({
       this.addingConditions = 0;
       this.editingConditions = 0;
       this.spawning = false;
-      this.settingDeck = false;
       this.editingDeck = false;
     },
     saveGame() {

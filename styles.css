@@ -29,6 +29,16 @@ label {
   touch-action: manipulation;
   cursor: pointer;
 }
+button {
+  background-position: center;
+  background-size: 70%;
+  background-repeat: no-repeat;
+}
+button[disabled] {
+  color: #969696;
+  background-color: #17120e !important;
+  cursor: not-allowed;
+}
 
 .text-button {
   height: calc(4 * var(--unit));
@@ -39,7 +49,7 @@ label {
 select {
   border: 1px solid #fff2;
   border-radius: calc(2 * var(--unit));
-  padding: 0 calc(2 * var(--unit));
+  padding: 0 calc(1 * var(--unit));
 
   font-family: serif;
   font-size: calc(2.5 * var(--unit));
@@ -103,24 +113,19 @@ main > * {
   top: 1%;
   left: 1%;
 }
-.zoom button {
-  background-position: center;
-  background-size: 70%;
-  background-repeat: no-repeat;
+.zoom-out {
+  background-image: url(img/icons/zoom_out.svg);
 }
 .zoom-in {
   background-image: url(img/icons/zoom_in.svg);
-}
-.zoom-out {
   margin-left: calc(1 * var(--unit));
-  background-image: url(img/icons/zoom_out.svg);
 }
 
 /* ------------ enemies ------------ */
 .enemies {
-  top: 7%;
+  top: 2%;
   left: 4.7%;
-  height: 80%;
+  height: 85%;
   width: 69.8%;
   display: flex;
 }
@@ -136,7 +141,7 @@ main > * {
 }
 
 .card {
-  flex: 0 0 63.9%;
+  flex: 0 0 60.4%;
   width: 100%;
   margin-top: var(--unit);
   border-radius: var(--unit);
@@ -188,6 +193,7 @@ main > * {
 .info {
   display: flex;
   flex-direction: column;
+  flex: 1;
 }
 .actions {
   display: flex;
@@ -237,7 +243,7 @@ main > * {
   flex: 2.02;
 }
 .large .card {
-  flex: 0 0 75%;
+  flex: 0 0 71.2%;
 }
 .large .info {
   flex-direction: row;
@@ -250,7 +256,6 @@ main > * {
 
 /* ------------ deck ------------ */
 .deck {
-  background: #fff2;
   top: 36%;
   left: 78%;
   height: 51%;
@@ -283,9 +288,9 @@ main > * {
   background-color: #0b0704;
   color: #fedfae;
   position: relative;
-  padding: calc(4 * var(--unit));
-  border-radius: calc(2 * var(--unit));
-  margin: calc(1 * var(--unit));
+  padding: 2vh;
+  border-radius: 2vh;
+  margin: 1vh;
   min-width: 30%;
 
   display: flex;
@@ -295,15 +300,15 @@ main > * {
 }
 
 .modal > *:not(:last-child) {
-  margin-bottom: calc(1 * var(--unit));
+  margin-bottom: 1vh;
 }
 
 .close-modal {
   position: absolute;
-  top: calc(1 * var(--unit));
-  right: calc(1 * var(--unit));
-  width: calc(3 * var(--unit));
-  height: calc(3 * var(--unit));
+  top: 1vh;
+  right: 1vh;
+  width: 3vh;
+  height: 3vh;
   color: #fedfae;
   background: #0b0704;
   font-family: sans-serif;
@@ -312,7 +317,7 @@ main > * {
 
 .modal .text {
   text-align: center;
-  font-size: calc(2.5 * var(--unit));
+  font-size: 2.5vh;
   align-self: center;
 }
 .modal hr {
@@ -348,7 +353,7 @@ input[type="radio"] {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: calc(2.5 * var(--unit));
+  font-size: 2.5vh;
 }
 input[type="radio"]:checked + label {
   border-color: darkred;
@@ -370,4 +375,46 @@ input[type="radio"]:checked + label {
   border-radius: 3vh;
   overflow: hidden;
   border: 0;
+}
+
+.setup select {
+  margin-right: 1vh;
+}
+
+.add-monster {
+  display: flex;
+  align-items: center;
+}
+.add-monster > *:not(:last-child) {
+  margin-right: 1vh;
+}
+
+.monsters {
+  max-height: 50vh;
+  overflow: hidden auto;
+  width: 100%;
+}
+table {
+  border-spacing: 0;
+  border: 0;
+  width: 100%;
+}
+th {
+  position: sticky;
+  top: 0;
+  background-color: #312b26;
+  border-bottom: 1px solid #fedfae;
+}
+td,
+th {
+  padding: 0.2vh 1vh;
+  text-align: left;
+}
+td img {
+  width: 2vh;
+}
+td .delete {
+  width: 4vh;
+  height: 4vh;
+  background-image: url(img/icons/delete.svg);
 }
