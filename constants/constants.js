@@ -23,6 +23,7 @@ const allMonsters = {
   ...warrens,
   ...common,
   ...darkest_dungeon,
+  ...allBosses,
 };
 const zones = {
   ruins,

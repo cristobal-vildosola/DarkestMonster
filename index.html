@@ -66,6 +66,7 @@
         <button class="text-button" @click="enterRoom()">Enter Room</button>
         <button class="text-button" @click="spawn()">+ Random Monster</button>
         <button class="text-button" @click="spawning = true">+ Specific Monster</button>
+        <button class="text-button" @click="spawningBoss = true">+ Boss</button>
       </div>
     </main>
 
@@ -131,6 +132,29 @@
           <button class="text-button" @click="spawn()" :disabled="monster == ''">Spawn</button>
         </template>
 
+        <template v-else-if="spawningBoss">
+          <div class="text">Spawn a boss</div>
+          <div>
+            <span class="text">Area: </span>
+            <select id="select-zone" v-model="zone">
+              <option value="" disabled hidden>Select</option>
+              <option v-for="item in zonePool" :value="item">{{format(item)}}</option>
+            </select>
+          </div>
+
+          <div>
+            <span class="text">Boss: </span>
+            <select id="select-monster" v-model="monster">
+              <option value="" disabled hidden>Select</option>
+              <option v-for="(_, name) in bosses[zone]" :value="name">{{format(name)}}</option>
+            </select>
+          </div>
+
+          <button class="text-button" @click="spawnBoss()" :disabled="monster == ''">
+            Spawn
+          </button>
+        </template>
+
         <template v-else-if="editingDeck">
           <div class="text">Set up a new deck</div>
           <div class="modal-buttons">
@@ -171,7 +195,7 @@
                   <img :src="`img/banners/${ allMonsters[item.name].zone }.webp`" />
                 </td>
 
-                <td>{{ format(item.name) }} {{ "I".repeat(allMonsters[item.name].level) }}</td>
+                <td>{{ format(item.name) }} {{ "I".repeat(allMonsters[item.name].level || 0) }}</td>
 
                 <td>
                   <select :id="item.name + '-copies'" v-model="item.copies">
@@ -223,6 +247,7 @@
   <script src="constants/cove.js"></script>
   <script src="constants/warrens.js"></script>
   <script src="constants/darkest.js"></script>
+  <script src="constants/bosses.js"></script>
   <script src="constants/constants.js"></script>
   <script src="app.js"></script>
 </body>

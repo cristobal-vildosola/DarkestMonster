@@ -10,7 +10,7 @@ createApp({
   data() {
     return {
       monsters: [],
-      deck: Object.entries(allMonsters).map(([name, info]) => ({
+      deck: Object.entries({ ...common, ...ruins }).map(([name, info]) => ({
         name: name,
         copies: info.copies,
         spawned: 0,
@@ -21,6 +21,7 @@ createApp({
       turns: 0,
 
       spawning: false,
+      spawningBoss: false,
       zones: zones,
       monster: '',
       copies: 0,
@@ -32,6 +33,7 @@ createApp({
 
       conditions: conditions,
       allMonsters: allMonsters,
+      bosses: bosses,
       zoom: 0.98,
     };
   },
@@ -68,7 +70,7 @@ createApp({
       };
     },
     opened() {
-      return this.editingConditions || this.spawning || this.editingDeck;
+      return this.editingConditions || this.spawning || this.spawningBoss || this.editingDeck;
     },
   },
 
@@ -208,6 +210,15 @@ createApp({
       }
       return monsters[(Math.random() * (monsters.length - 1)) | 0];
     },
+    spawnBoss() {
+      this.monsters.push({
+        name: this.monster,
+        level: this.zone == 'darkest_dungeon' ? 1 : this.act,
+        ...baseMonster(),
+      });
+      this.monster = '';
+      this.closeModal();
+    },
 
     setUp() {
       let monsters = { ...common, ...zones[this.zone] };
@@ -247,6 +258,7 @@ createApp({
     closeModal() {
       this.editingConditions = 0;
       this.spawning = false;
+      this.spawningBoss = false;
       this.editingDeck = false;
     },
     saveGame() {

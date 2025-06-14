@@ -208,6 +208,10 @@ main > * {
   justify-content: center;
   margin-top: var(--unit);
 }
+.life > *:not(:first-child) {
+  margin-left: calc(1 * var(--unit));
+}
+
 .wounds {
   width: calc(11 * var(--unit));
   height: calc(11 * var(--unit));
@@ -222,7 +226,6 @@ main > * {
   background-repeat: no-repeat;
   background-size: 100%;
   border-radius: 100%;
-  margin-left: calc(1 * var(--unit));
 }
 .wound-5 {
   width: calc(6 * var(--unit));
