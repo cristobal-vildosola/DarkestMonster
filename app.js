@@ -10,7 +10,7 @@ createApp({
   data() {
     return {
       monsters: [],
-      deck: Object.entries(allMonsters).map(([name, info]) => ({
+      deck: Object.entries({ ...common, ...ruins }).map(([name, info]) => ({
         name: name,
         copies: info.copies,
         spawned: 0,
@@ -21,6 +21,7 @@ createApp({
       turns: 0,
 
       spawning: false,
+      spawningBoss: false,
       zones: zones,
       monster: '',
       copies: 0,
@@ -32,6 +33,7 @@ createApp({
 
       conditions: conditions,
       allMonsters: allMonsters,
+      bosses: bosses,
       zoom: 0.98,
     };
   },
@@ -61,14 +63,22 @@ createApp({
     fillers() {
       return 4 - this.numberSpawned;
     },
+    opened() {
+      return this.editingConditions || this.spawning || this.spawningBoss || this.editingDeck;
+    },
+    zoneBosses() {
+      if (!this.zone) return Object.keys(allBosses);
+
+      const pool = Object.keys(this.bosses[this.zone] || {});
+      if (this.zone == 'darkest_dungeon' || !this.act) return pool;
+
+      return pool.filter((x) => x.includes(this.act || ''));
+    },
     save() {
       return {
         monsters: this.monsters,
         deck: this.deck,
       };
-    },
-    opened() {
-      return this.editingConditions || this.spawning || this.editingDeck;
     },
   },
 
@@ -78,12 +88,16 @@ createApp({
         backgroundImage: `url(img/tokens/${condition}.webp)`,
       };
     },
-    monsterCard(name) {
-      if (!allMonsters[name]) return;
-      const card = allMonsters[name];
+    monsterCard(index) {
+      const monster = this.monsters[index];
+      if (!allMonsters[monster.name]) return;
+
+      let card = allMonsters[monster.name];
+      if (monster.name == 'rapturous_cultist' && monster.rep == 2) card = rapturous_cultist_extra;
+
       return {
         backgroundImage: `url('${card.img}')`,
-        backgroundPosition: this.position(card.index, card.x, card.y),
+        backgroundPosition: this.position(card.index + monster.rep, card.x, card.y),
         backgroundSize: `${card.x * 100}%`,
       };
     },
@@ -100,15 +114,18 @@ createApp({
         .map((t) => t.charAt(0).toUpperCase() + t.slice(1))
         .join(' ');
     },
+    formatBoss(text) {
+      return this.format(text).substring(0, text.length - (this.act ? 2 : 0));
+    },
 
     addCondition() {
       const index = this.editingConditions - 1;
 
       if (['push', 'pull'].includes(this.condition)) {
         const removed = this.monsters.splice(index, 1);
-        const dest = index + (this.condition == 'push' ? this.turns : -this.turns);
+        const dest = this.clamp(index + (this.condition == 'push' ? this.turns : -this.turns), 0, this.monsters.length);
         this.monsters.splice(dest, 0, ...removed);
-        this.editingConditions = Math.max(Math.min(dest + 1, this.monsters.length), 1);
+        this.editingConditions = dest + 1;
         return;
       }
 
@@ -141,12 +158,20 @@ createApp({
     },
 
     wound(i, x) {
-      this.monsters[i].wounds = Math.max(this.monsters[i].wounds + x, 0);
+      this.monsters[i].wounds = this.clamp(this.monsters[i].wounds + x);
     },
     kill(i) {
       this.monsters.splice(i, 1);
     },
+    clamp(x, min = 0, max = 1000) {
+      return Math.max(Math.min(x, max), min);
+    },
 
+    monsterRep(name) {
+      let rep = 0;
+      while (this.monsters.find((x) => x.name == name && x.rep == rep)) rep++;
+      return rep;
+    },
     enterRoom() {
       let name,
         index,
@@ -156,7 +181,7 @@ createApp({
 
       while (this.numberSpawned < 4) {
         name = this.randomMonster();
-        const monster = { name, ...baseMonster() };
+        const monster = { name, rep: this.monsterRep(name), ...baseMonster() };
 
         // remove last small added if necessary
         if (allMonsters[name].large && this.numberSpawned == 3) {
@@ -191,7 +216,7 @@ createApp({
           name = this.randomMonster();
         }
 
-        this.monsters.push({ name, ...baseMonster() });
+        this.monsters.push({ name, rep: this.monsterRep(name), ...baseMonster() });
         this.deck.forEach((x) => (x.spawned += x.name === name ? 1 : 0));
       }
       this.spawning = false;
@@ -208,20 +233,21 @@ createApp({
       }
       return monsters[(Math.random() * (monsters.length - 1)) | 0];
     },
+    spawnBoss() {
+      this.monsters.push({ name: this.monster, rep: this.monsterRep(this.monster), ...baseMonster() });
+      this.monster = '';
+    },
 
     setUp() {
-      let monsters = { ...common, ...zones[this.zone] };
+      let monsters = { ...zones[this.zone], ...common };
       if (this.zone == 'darkest_dungeon') {
         monsters = darkest_dungeon;
-        this.level = 3;
+        this.act = 3;
       }
 
       this.deck = Object.entries(monsters)
         .filter(([_, info]) => info.level <= this.act)
         .map(([name, info]) => ({ name: name, copies: info.copies, spawned: 0 }));
-
-      this.zone = '';
-      this.act = 0;
     },
     resetDeck() {
       this.deck.forEach((m) => (m.spawned = 0));
@@ -237,16 +263,14 @@ createApp({
     removeLevel1() {
       this.deck.forEach((m) => {
         const info = allMonsters[m.name];
-        if (info.level === 1 && !info.large) m.copies = Math.max(1, m.copies - 1);
+        if (info.level === 1 && !info.large) m.copies = this.clamp(m.copies - 1, 1);
       });
-    },
-    resetSpawned() {
-      this.deck.forEach((m) => (m.spawned = 0));
     },
 
     closeModal() {
       this.editingConditions = 0;
       this.spawning = false;
+      this.spawningBoss = false;
       this.editingDeck = false;
     },
     saveGame() {

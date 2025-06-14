@@ -56,6 +56,9 @@ select {
   touch-action: manipulation;
   cursor: pointer;
 }
+select[disabled] {
+  cursor: not-allowed;
+}
 
 .dual-buttons {
   position: relative;
@@ -63,7 +66,7 @@ select {
 .dual-buttons button {
   position: absolute;
   margin: 0;
-  background: #fff2;
+  background: #fff1;
   height: 100%;
   width: 50%;
 }
@@ -208,6 +211,10 @@ main > * {
   justify-content: center;
   margin-top: var(--unit);
 }
+.life > *:not(:first-child) {
+  margin-left: calc(1 * var(--unit));
+}
+
 .wounds {
   width: calc(11 * var(--unit));
   height: calc(11 * var(--unit));
@@ -216,26 +223,28 @@ main > * {
   align-items: center;
   justify-content: center;
   color: red;
-  font-size: calc(3.5 * var(--unit));
+  font-size: calc(4 * var(--unit));
 
   background-image: url(img/tokens/wounds.webp);
   background-repeat: no-repeat;
   background-size: 100%;
   border-radius: 100%;
-  margin-left: calc(1 * var(--unit));
 }
-.wound-5 {
+.wound-bulk {
   width: calc(6 * var(--unit));
   height: calc(6 * var(--unit));
   border-radius: 100%;
   padding: 0;
-  border-color: #8b0000b0;
+  border: 2px solid #a81b52;
   font-size: calc(2.5 * var(--unit));
   color: red;
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
+}
+.wound-bulk + .wound-bulk {
+  margin-top: var(--unit);
 }
 
 /* ------------ large monsters ------------ */
@@ -411,6 +420,7 @@ td img {
 }
 td select {
   width: 100%;
+  text-align: center;
 }
 td .delete {
   width: 4vh;

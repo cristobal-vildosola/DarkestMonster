@@ -3,10 +3,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta charset="UTF-8" />
 
-  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
   <link rel="stylesheet" href="styles.css" />
 
-  <title>Darkest Monsters - by Piña</title>
+  <title>Darkest Monster - by Piña</title>
   <link rel="icon" type="image/png" sizes="32x32" href="img/icons/favicon-32x32.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="img/icons/apple-touch-icon.png" />
 
@@ -26,7 +26,7 @@
 
       <div class="enemies">
         <div v-for="(monster, index) in monsters" class="enemy" :class="{large: allMonsters[monster.name].large}">
-          <div class="card" :style="monsterCard(monster.name)">
+          <div class="card" :style="monsterCard(index)">
             <div class="conditions">
               <div
                 v-for="(item, i) in monster.conditions"
@@ -46,13 +46,19 @@
               <button class="text-button" @click="startTurn(index)">Start Turn</button>
             </div>
             <div class="life">
-              <button @click="wound(index, -5)" class="wound-5">-5</button>
+              <div>
+                <button @click="wound(index, -5)" class="wound-bulk">-5</button>
+                <button @click="wound(index, -10)" class="wound-bulk">-10</button>
+              </div>
               <div class="wounds dual-buttons">
                 <button @click="wound(index, -1)"></button>
                 <span>{{ monster.wounds }}</span>
                 <button @click="wound(index, 1)"></button>
               </div>
-              <button @click="wound(index, 5)" class="wound-5">+5</button>
+              <div>
+                <button @click="wound(index, 5)" class="wound-bulk">+5</button>
+                <button @click="wound(index, 10)" class="wound-bulk">+10</button>
+              </div>
             </div>
           </div>
         </div>
@@ -62,10 +68,9 @@
 
       <div class="deck">
         <button class="text-button" @click="editingDeck = true">Edit Deck</button>
-        <button class="text-button" @click="resetSpawned()">Re-Shuffle Deck</button>
         <button class="text-button" @click="enterRoom()">Enter Room</button>
-        <button class="text-button" @click="spawn()">+ Random Monster</button>
-        <button class="text-button" @click="spawning = true">+ Specific Monster</button>
+        <button class="text-button" @click="spawning = true">Spawn Monster</button>
+        <button class="text-button" @click="spawningBoss = true">Spawn Boss</button>
       </div>
     </main>
 
@@ -129,10 +134,46 @@
             </select>
           </div>
           <button class="text-button" @click="spawn()" :disabled="monster == ''">Spawn</button>
+          
+          <div class="text modal-buttons">
+            <hr />
+            <span>OR</span>
+            <hr />
+          </div>
+          
+          <button class="text-button" @click="spawn()">Spawn a Random Monster</button>
+        </template>
+
+        <template v-else-if="spawningBoss">
+          <div class="text">Spawn a boss</div>
+
+          <div class="modal-buttons">
+            <span class="text">Area:</span>
+            <select id="select-zone" v-model="zone">
+              <option value="" disabled hidden>Select</option>
+              <option v-for="item in zonePool" :value="item">{{format(item)}}</option>
+            </select>
+
+            <span class="text"> Act:</span>
+            <select id="select-act" v-model="act" :disabled="zone == 'darkest_dungeon'">
+              <option value="0" disabled hidden>Select</option>
+              <option v-for="item in 3" :value="item">{{item}}</option>
+            </select>
+          </div>
+
+          <div class="modal-buttons">
+            <span class="text">Boss:</span>
+            <select id="select-monster" v-model="monster">
+              <option value="" disabled hidden>Select</option>
+              <option v-for="name in zoneBosses" :value="name">{{formatBoss(name)}}</option>
+            </select>
+          </div>
+
+          <button class="text-button" @click="spawnBoss()" :disabled="monster == ''">Spawn</button>
         </template>
 
         <template v-else-if="editingDeck">
-          <div class="text">Set up a new deck</div>
+          <div class="text">Set up an area deck</div>
           <div class="modal-buttons">
             <span class="text">Area: </span>
             <select id="select-zone" v-model="zone">
@@ -146,7 +187,9 @@
               <option v-for="item in 3" :value="item">{{item}}</option>
             </select>
 
-            <button class="text-button" @click="setUp()" :disabled="act == 0 || zone == ''">Confirm</button>
+            <button class="text-button" @click="setUp()" :disabled="act == 0 && zone != 'darkest_dungeon'">
+              Confirm
+            </button>
           </div>
 
           <div class="text modal-buttons">
@@ -171,7 +214,7 @@
                   <img :src="`img/banners/${ allMonsters[item.name].zone }.webp`" />
                 </td>
 
-                <td>{{ format(item.name) }} {{ "I".repeat(allMonsters[item.name].level) }}</td>
+                <td>{{ format(item.name) }} {{ "I".repeat(allMonsters[item.name].level || 0) }}</td>
 
                 <td>
                   <select :id="item.name + '-copies'" v-model="item.copies">
@@ -205,12 +248,15 @@
                     <option v-for="item in 3" :value="item">{{item}}</option>
                   </select>
                 </td>
-                <td colspan="2"><button class="text-button" @click="addToDeck()">+ Add Monster</button></td>
+                <td colspan="2"><button class="text-button" @click="addToDeck()">+ Add</button></td>
               </tr>
             </table>
           </div>
 
-          <button class="text-button" @click="removeLevel1()">Remove one of each level I</button>
+          <div class="modal-buttons">
+            <button class="text-button" @click="removeLevel1()">Remove one of each level I</button>
+            <button class="text-button" @click="resetDeck()">Reset Spawned</button>
+          </div>
           <button class="text-button" @click="closeModal()">Done</button>
         </template>
       </div>
@@ -223,6 +269,7 @@
   <script src="constants/cove.js"></script>
   <script src="constants/warrens.js"></script>
   <script src="constants/darkest.js"></script>
+  <script src="constants/bosses.js"></script>
   <script src="constants/constants.js"></script>
   <script src="app.js"></script>
 </body>
