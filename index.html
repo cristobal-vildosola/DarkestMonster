@@ -47,8 +47,8 @@
             </div>
             <div class="life">
               <div>
-                <button @click="wound(index, -5)" class="wound-bulk">-5</button>
-                <button @click="wound(index, -10)" class="wound-bulk">-10</button>
+                <button @click="wound(index, -5)" class="wounds wound-bulk">-5</button>
+                <button @click="wound(index, -10)" class="wounds wound-bulk">-10</button>
               </div>
               <div class="wounds dual-buttons">
                 <button @click="wound(index, -1)"></button>
@@ -56,8 +56,8 @@
                 <button @click="wound(index, 1)"></button>
               </div>
               <div>
-                <button @click="wound(index, 5)" class="wound-bulk">+5</button>
-                <button @click="wound(index, 10)" class="wound-bulk">+10</button>
+                <button @click="wound(index, 5)" class="wounds wound-bulk">+5</button>
+                <button @click="wound(index, 10)" class="wounds wound-bulk">+10</button>
               </div>
             </div>
           </div>
@@ -71,6 +71,23 @@
         <button class="text-button" @click="enterRoom()">Enter Room</button>
         <button class="text-button" @click="spawning = true">Spawn Monster</button>
         <button class="text-button" @click="spawningBoss = true">Spawn Boss</button>
+      </div>
+
+      <div class="music">
+        <span class="text">
+          Music:
+          <select id="select-music" v-model="music">
+            <option v-for="song in Object.keys(videos)" :value="song">{{song}}</option>
+          </select>
+        </span>
+        <div>
+          <iframe
+            :src="`https://www.youtube.com/embed/${videoId}?playlist=${videoId}&loop=1&autoplay=1&controls=0&disablekb=1&fs=0`"
+            frameborder="0"
+            allow="autoplay"
+            referrerpolicy="strict-origin-when-cross-origin"
+          ></iframe>
+        </div>
       </div>
     </main>
 
@@ -125,22 +142,36 @@
 
         <template v-else-if="spawning">
           <div class="text">Spawn a monster</div>
-          <div>
-            <select id="select-monster" v-model="monster">
-              <option value="" disabled hidden>Select Monster</option>
-              <optgroup v-for="(value, key) in zones" :label="format(key)">
-                <option v-for="(_, name) in value" :value="name">{{format(name)}}</option>
-              </optgroup>
+
+          <div class="modal-buttons">
+            <span class="text">Area: </span>
+            <select id="select-zone" v-model="zone">
+              <option value="" disabled hidden>Select</option>
+              <option v-for="item in zonePool" :value="item">{{format(item)}}</option>
+            </select>
+
+            <span class="text"> Act:</span>
+            <select id="select-act" v-model="act" :disabled="zone == 'darkest_dungeon'">
+              <option value="0" disabled hidden>Select</option>
+              <option v-for="item in 3" :value="item">{{item}}</option>
             </select>
           </div>
+          <div class="modal-buttons">
+            <span class="text">Monster: </span>
+            <select id="select-monster" v-model="monster">
+              <option value="" disabled hidden>Select</option>
+              <option v-for="name in zoneMonsters" :value="name">{{format(name)}}</option>
+            </select>
+          </div>
+
           <button class="text-button" @click="spawn()" :disabled="monster == ''">Spawn</button>
-          
+
           <div class="text modal-buttons">
             <hr />
             <span>OR</span>
             <hr />
           </div>
-          
+
           <button class="text-button" @click="spawn()">Spawn a Random Monster</button>
         </template>
 

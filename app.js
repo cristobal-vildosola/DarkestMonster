@@ -15,6 +15,8 @@ createApp({
         copies: info.copies,
         spawned: 0,
       })),
+      zone: 'ruins',
+      act: 1,
 
       editingConditions: 0,
       condition: '',
@@ -22,19 +24,19 @@ createApp({
 
       spawning: false,
       spawningBoss: false,
-      zones: zones,
+      zones,
       monster: '',
       copies: 0,
 
       editingDeck: false,
-      zone: '',
       zonePool: Object.keys(zones).filter((x) => x !== 'common'),
-      act: 0,
 
-      conditions: conditions,
-      allMonsters: allMonsters,
-      bosses: bosses,
+      conditions,
+      allMonsters,
+      bosses,
       zoom: 0.98,
+      music: 'The Hamlet',
+      videos,
     };
   },
 
@@ -54,6 +56,12 @@ createApp({
       },
       deep: true,
     },
+    zone() {
+      this.saveGame();
+    },
+    act() {
+      this.saveGame();
+    },
   },
 
   computed: {
@@ -66,6 +74,13 @@ createApp({
     opened() {
       return this.editingConditions || this.spawning || this.spawningBoss || this.editingDeck;
     },
+    zoneMonsters() {
+      const monsters = { ...zones[this.zone], ...common };
+      return Object.entries(monsters)
+        .filter(([_, info]) => info.level <= this.act)
+        .map(([name, _]) => name);
+    },
+
     zoneBosses() {
       if (!this.zone) return Object.keys(allBosses);
 
@@ -78,7 +93,13 @@ createApp({
       return {
         monsters: this.monsters,
         deck: this.deck,
+        zone: this.zone,
+        act: this.act,
       };
+    },
+
+    videoId() {
+      return videos[this.music];
     },
   },
 
@@ -306,6 +327,8 @@ createApp({
     load(save) {
       this.monsters = save.monsters;
       this.deck = save.deck;
+      this.zone = save.zone;
+      this.act = save.act;
     },
   },
 }).mount('#app');
