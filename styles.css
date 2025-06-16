@@ -102,7 +102,6 @@ main {
   background-image: url(img/board.webp);
   background-size: 100%;
   background-repeat: no-repeat;
-
   position: relative;
 }
 main > * {
@@ -150,8 +149,44 @@ main > * {
   background-repeat: no-repeat;
   position: relative;
 }
+.playing {
+  box-shadow: 0 0 calc(0.5 * var(--unit)) calc(0.5 * var(--unit)) darkred;
+  animation-name: pulse;
+  animation-duration: 2s;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-in-out;
+}
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 calc(0.5 * var(--unit)) calc(0.5 * var(--unit)) darkred;
+  }
+  50% {
+    box-shadow: 0 0 calc(0.5 * var(--unit)) calc(-0.5 * var(--unit)) darkred;
+  }
+  100% {
+    box-shadow: 0 0 calc(0.5 * var(--unit)) calc(0.5 * var(--unit)) darkred;
+  }
+}
 .card:hover .conditions {
   opacity: 0;
+}
+.card .actions {
+  position: absolute;
+  bottom: 0;
+  left: 1%;
+  font-size: calc(4 * var(--unit));
+}
+.stunned {
+  position: absolute;
+  bottom: 2%;
+  height: 12%;
+  left: 4%;
+  right: 4%;
+  background: #000a;
+  border-radius: 1vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .conditions {
@@ -189,7 +224,7 @@ main > * {
   background-size: 100%;
   background-repeat: no-repeat;
   overflow: hidden;
-  border: 1px solid #fff2;
+  border: 1px solid darkred;
 }
 
 .info {
@@ -266,10 +301,35 @@ main > * {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: space-around;
+  text-align: center;
 }
-.deck > *:not(:last-child) {
+.deck div {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+.deck button {
   margin-bottom: var(--unit);
+}
+.deck .danger {
+  background: darkred;
+  border-radius: calc(2 * var(--unit));
+  animation-name: danger;
+  animation-duration: 2s;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-in-out;
+}
+@keyframes danger {
+  0% {
+    background: darkred;
+  }
+  50% {
+    background: transparent;
+  }
+  100% {
+    background: darkred;
+  }
 }
 
 /* ------------ music ------------ */
@@ -389,6 +449,7 @@ input[type='radio']:checked + label {
   width: 6vh;
   height: 6vh;
   border-radius: 100%;
+  border: 1px solid #fff2;
 }
 .modal button.stack {
   width: 6vh;

@@ -26,7 +26,7 @@
 
       <div class="enemies">
         <div v-for="(monster, index) in monsters" class="enemy" :class="{large: allMonsters[monster.name].large}">
-          <div class="card" :style="monsterCard(index)">
+          <div class="card" :style="monsterCard(index)" :class="{ playing: monster.playing }">
             <div class="conditions">
               <div
                 v-for="(item, i) in monster.conditions"
@@ -37,13 +37,15 @@
                 <div v-for="_ in item.turns" class="condition" :style="conditionCard(item.condition)"></div>
               </div>
             </div>
+
+            <div class="actions">{{ "|".repeat(monster.turns) }}</div>
+            <div v-if="monster.stunned" class="stunned">Monster stunned for this turn!</div>
           </div>
 
           <div class="info">
             <div class="actions">
               <button class="text-button" @click="kill(index)">Remove Monster</button>
               <button class="text-button" @click="editingConditions = index + 1">Edit Conditions</button>
-              <button class="text-button" @click="startTurn(index)">Start Turn</button>
             </div>
             <div class="life">
               <div>
@@ -67,10 +69,18 @@
       </div>
 
       <div class="deck">
-        <button class="text-button" @click="editingDeck = true">Edit Deck</button>
-        <button class="text-button" @click="enterRoom()">Enter Room</button>
-        <button class="text-button" @click="spawning = true">Spawn Monster</button>
-        <button class="text-button" @click="spawningBoss = true">Spawn Boss</button>
+        <div>
+          <button class="text-button" @click="spawning = true">Spawn Monster</button>
+          <button class="text-button" @click="spawningBoss = true">Spawn Boss</button>
+        </div>
+        <div>
+          <button class="text-button" @click="editingDeck = true">Edit Deck</button>
+          <button class="text-button" @click="enterRoom()">Enter Room</button>
+        </div>
+        <div>
+          <button class="text-button" @click="nextTurn()">Next Monster Turn</button>
+          <div class="text" :class="{danger: round >= 4}">Round {{round}}</div>
+        </div>
       </div>
 
       <div class="music">

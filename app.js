@@ -3,7 +3,7 @@ const { createApp } = Vue;
 const LOCAL_STORAGE_KEY = 'DarkestMonsters';
 
 function baseMonster() {
-  return { wounds: 0, conditions: [], stunned: false };
+  return { wounds: 0, conditions: [], stunned: false, playing: false };
 }
 
 createApp({
@@ -17,6 +17,7 @@ createApp({
       })),
       zone: 'ruins',
       act: 1,
+      round: 1,
 
       editingConditions: 0,
       condition: '',
@@ -62,6 +63,9 @@ createApp({
     act() {
       this.saveGame();
     },
+    round() {
+      this.saveGame();
+    },
   },
 
   computed: {
@@ -95,6 +99,7 @@ createApp({
         deck: this.deck,
         zone: this.zone,
         act: this.act,
+        round: this.round,
       };
     },
 
@@ -156,6 +161,26 @@ createApp({
       });
       this.monsters[index].conditions.sort((a, b) => (a.condition < b.condition ? -1 : 1));
     },
+    nextTurn() {
+      if (!this.monsters.length) return;
+
+      this.monsters.forEach((m) => {
+        m.playing = false;
+        m.stunned = false;
+      });
+      const index = this.monsters.findIndex((m) => m.turns > 0);
+
+      // start next round
+      if (index < 0) {
+        this.round += 1;
+        this.monsters.forEach((m) => (m.turns = allMonsters[m.name].actions || 1));
+
+        // update baron actions
+        this.monsters.filter((m) => m.name.startsWith('baron')).forEach((m) => (m.turns = 5 - this.monsters.length));
+        return this.nextTurn();
+      }
+      this.startTurn(index);
+    },
     startTurn(i) {
       this.monsters[i].stunned = false;
       this.monsters[i].conditions.forEach((c) => {
@@ -169,6 +194,8 @@ createApp({
       this.monsters[i].conditions = this.monsters[i].conditions
         .map((c) => ({ ...c, turns: c.turns - 1 }))
         .filter((c) => c.turns > 0);
+      this.monsters[i].turns -= 1;
+      this.monsters[i].playing = true;
     },
     removeCondition(i) {
       this.monsters[this.editingConditions - 1].conditions.splice(i, 1);
@@ -183,17 +210,23 @@ createApp({
     },
     kill(i) {
       this.monsters.splice(i, 1);
+      if (!this.monsters.length) this.round = 1;
     },
     clamp(x, min = 0, max = 1000) {
       return Math.max(Math.min(x, max), min);
     },
 
+    monsterInfo(name) {
+      const turns = allMonsters[name].actions || 1;
+      return { name, rep: this.monsterRep(name), turns, ...baseMonster() };
+    },
     monsterRep(name) {
       let rep = 0;
       while (this.monsters.find((x) => x.name == name && x.rep == rep)) rep++;
       return rep;
     },
     enterRoom() {
+      this.round = 1;
       let name,
         index,
         back = 0,
@@ -202,7 +235,7 @@ createApp({
 
       while (this.numberSpawned < 4) {
         name = this.randomMonster();
-        const monster = { name, rep: this.monsterRep(name), ...baseMonster() };
+        const monster = this.monsterInfo(name);
 
         // remove last small added if necessary
         if (allMonsters[name].large && this.numberSpawned == 3) {
@@ -237,8 +270,11 @@ createApp({
           name = this.randomMonster();
         }
 
-        this.monsters.push({ name, rep: this.monsterRep(name), ...baseMonster() });
+        this.monsters.push(this.monsterInfo(name));
         this.deck.forEach((x) => (x.spawned += x.name === name ? 1 : 0));
+
+        // update baron actions
+        this.monsters.filter((m) => m.name.startsWith('baron')).forEach((m) => (m.turns = this.clamp(m.turns - 1)));
       }
       this.spawning = false;
       this.monster = '';
@@ -255,7 +291,7 @@ createApp({
       return monsters[(Math.random() * (monsters.length - 1)) | 0];
     },
     spawnBoss() {
-      this.monsters.push({ name: this.monster, rep: this.monsterRep(this.monster), ...baseMonster() });
+      this.monsters.push(this.monsterInfo(this.monster));
       this.monster = '';
     },
 
@@ -329,6 +365,7 @@ createApp({
       this.deck = save.deck;
       this.zone = save.zone;
       this.act = save.act;
+      this.round = save.round;
     },
   },
 }).mount('#app');
