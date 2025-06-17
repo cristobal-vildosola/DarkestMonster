@@ -84,7 +84,6 @@ createApp({
         .filter(([_, info]) => info.level <= this.act)
         .map(([name, _]) => name);
     },
-
     zoneBosses() {
       if (!this.zone) return Object.keys(allBosses);
 
@@ -92,6 +91,9 @@ createApp({
       if (this.zone == 'darkest_dungeon' || !this.act) return pool;
 
       return pool.filter((x) => x.includes(this.act || ''));
+    },
+    videoId() {
+      return videos[this.music];
     },
     save() {
       return {
@@ -101,10 +103,6 @@ createApp({
         act: this.act,
         round: this.round,
       };
-    },
-
-    videoId() {
-      return videos[this.music];
     },
   },
 
@@ -141,7 +139,7 @@ createApp({
         .join(' ');
     },
     formatBoss(text) {
-      return this.format(text).substring(0, text.length - (this.act ? 2 : 0));
+      return this.format(text).substring(0, text.length - (this.zone == 'darkest_dungeon' ? 0 : 2));
     },
 
     addCondition() {
@@ -276,8 +274,7 @@ createApp({
         // update baron actions
         this.monsters.filter((m) => m.name.startsWith('baron')).forEach((m) => (m.turns = this.clamp(m.turns - 1)));
       }
-      this.spawning = false;
-      this.monster = '';
+      this.closeModal();
     },
     randomMonster() {
       const monsters = this.deck.reduce(
@@ -292,7 +289,6 @@ createApp({
     },
     spawnBoss() {
       this.monsters.push(this.monsterInfo(this.monster));
-      this.monster = '';
     },
 
     setUp() {
@@ -312,7 +308,6 @@ createApp({
     addToDeck() {
       this.deck.push({ name: this.monster, copies: this.copies, spawned: 0 });
       this.monster = '';
-      this.copies = 0;
     },
     remove(index) {
       this.deck.splice(index, 1);
@@ -329,6 +324,7 @@ createApp({
       this.spawning = false;
       this.spawningBoss = false;
       this.editingDeck = false;
+      this.monster = '';
     },
     saveGame() {
       localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(this.save));
