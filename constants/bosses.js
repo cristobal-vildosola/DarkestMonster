@@ -107,7 +107,7 @@ const bosses = {
     white_cell_stalk: { large: false, actions: 2, index: 34, ...darkestS },
     shuffling_horror: { large: true, actions: 2, index: 12, ...bossesL, zone: 'darkest' },
 
-    ancestor_1st_form: { large: false, index: 35, ...darkestS },
+    ancestor_1st_form: { large: false, actions: 4, index: 35, ...darkestS },
     perfect_reflection: { large: false, index: 36, ...darkestS },
     imperfect_reflection: { large: false, index: 39, ...darkestS },
     ancestor_2nd_form: { large: true, actions: 2, index: 13, ...bossesL, zone: 'darkest' },

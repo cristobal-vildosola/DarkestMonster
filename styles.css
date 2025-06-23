@@ -168,7 +168,7 @@ main > * {
   }
 }
 .card:hover .conditions {
-  opacity: 0;
+  display: none;
 }
 .card .actions {
   position: absolute;
@@ -370,12 +370,11 @@ main > * {
 /* ------------ overlay ------------ */
 .overlay {
   z-index: 100;
-  position: fixed;
   top: 0;
   left: 0;
   height: 100%;
   width: 100%;
-  background-color: #0006;
+  background-color: #0008;
 
   display: flex;
   justify-content: center;
@@ -385,9 +384,9 @@ main > * {
 .modal {
   background-color: #0b0704;
   position: relative;
-  padding: 2vh;
-  border-radius: 2vh;
-  margin: 1vh;
+  padding: calc(2 * var(--unit));
+  border-radius: calc(2 * var(--unit));
+  margin: calc(1 * var(--unit));
   min-width: 30%;
 
   display: flex;
@@ -397,15 +396,16 @@ main > * {
 }
 
 .modal > *:not(:last-child) {
-  margin-bottom: 1vh;
+  margin-bottom: calc(1 * var(--unit));
 }
 
 .close-modal {
+  z-index: 1;
   position: absolute;
-  top: 1vh;
-  right: 1vh;
-  width: 3vh;
-  height: 3vh;
+  top: calc(1 * var(--unit));
+  right: calc(1 * var(--unit));
+  width: calc(3 * var(--unit));
+  height: calc(3 * var(--unit));
   background: #0b0704;
   font-family: sans-serif;
   border: 0;
@@ -416,7 +416,7 @@ main > * {
 }
 .modal .text {
   text-align: center;
-  font-size: 2.5vh;
+  font-size: calc(2.5 * var(--unit));
   align-self: center;
 }
 hr {
@@ -431,48 +431,48 @@ hr {
   justify-content: center;
   align-items: start;
   width: 90vw;
-  max-width: 65vh;
-  margin-left: -1vh;
+  max-width: calc(65 * var(--unit));
+  margin-left: calc(-1 * var(--unit));
 }
 .modal-buttons > * {
-  margin-left: 1vh;
-  margin-bottom: 1vh;
+  margin-left: calc(1 * var(--unit));
+  margin-bottom: calc(1 * var(--unit));
 }
 
 input[type='radio'] {
   display: none;
 }
 .radio-label {
-  height: 4vh;
-  border-radius: 2vh;
-  padding: 1vh;
+  height: calc(4 * var(--unit));
+  border-radius: calc(2 * var(--unit));
+  padding: calc(1 * var(--unit));
 
   position: relative;
   overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2.5vh;
+  font-size: calc(2.5 * var(--unit));
 }
 input[type='radio']:checked + label {
   border-color: darkred;
-  box-shadow: 0 0 0.5vh 0.5vh darkred;
+  box-shadow: 0 0 calc(0.5 * var(--unit)) calc(0.5 * var(--unit)) darkred;
 }
 .modal button + button {
-  margin-left: 1vh;
+  margin-left: calc(1 * var(--unit));
 }
 
 .modal .condition {
-  width: 6vh;
-  height: 6vh;
+  width: calc(6 * var(--unit));
+  height: calc(6 * var(--unit));
   border-radius: 100%;
   border: 1px solid #fff2;
 }
 .modal button.stack {
-  width: 6vh;
-  height: 11vh;
+  width: calc(6 * var(--unit));
+  height: calc(11 * var(--unit));
   background-color: transparent;
-  border-radius: 3vh;
+  border-radius: calc(3 * var(--unit));
   overflow: hidden;
   border: 0;
 }
@@ -482,11 +482,11 @@ input[type='radio']:checked + label {
   align-items: center;
 }
 .add-monster > *:not(:last-child) {
-  margin-right: 1vh;
+  margin-right: calc(1 * var(--unit));
 }
 
 .monsters {
-  max-height: 50vh;
+  max-height: calc(50 * var(--unit));
   overflow: hidden auto;
   width: 100%;
 }
@@ -503,18 +503,29 @@ th {
 }
 td,
 th {
-  padding: 0.2vh 1vh;
+  padding: calc(0.2 * var(--unit)) calc(1 * var(--unit));
   text-align: left;
 }
 td img {
-  width: 2vh;
+  width: calc(2 * var(--unit));
 }
 td select {
   width: 100%;
   text-align: center;
 }
 td .delete {
-  width: 4vh;
-  height: 4vh;
+  width: calc(4 * var(--unit));
+  height: calc(4 * var(--unit));
   background-image: url(img/icons/delete.svg);
+}
+
+.focused {
+  flex: unset;
+  height: calc(95 * var(--unit));
+  width: calc(55.4 * var(--unit));
+  margin: calc(-3 * var(--unit));
+  box-shadow: 0 0 15px 2px darkred;
+}
+.large.focused {
+  width: calc(95 * var(--unit));
 }

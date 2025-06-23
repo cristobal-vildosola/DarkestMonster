@@ -6,15 +6,17 @@ function baseMonster() {
   return { wounds: 0, conditions: [], stunned: false, playing: false };
 }
 
-createApp({
+const app = createApp({
   data() {
     return {
       monsters: [],
-      deck: Object.entries({ ...common, ...ruins }).map(([name, info]) => ({
-        name: name,
-        copies: info.copies,
-        spawned: 0,
-      })),
+      deck: Object.entries({ ...ruins, ...common })
+        .filter(([_, info]) => info.level == 1)
+        .map(([name, info]) => ({
+          name: name,
+          copies: info.copies,
+          spawned: 0,
+        })),
       zone: 'ruins',
       act: 1,
       round: 1,
@@ -24,18 +26,20 @@ createApp({
       turns: 0,
 
       spawning: false,
-      spawningBoss: false,
-      zones,
       monster: '',
-      copies: 0,
+      spawningBoss: false,
+      boss: '',
 
       editingDeck: false,
-      zonePool: Object.keys(zones).filter((x) => x !== 'common'),
+      copies: 0,
 
+      zones,
+      zonePool: Object.keys(zones).filter((x) => x !== 'common'),
       conditions,
       allMonsters,
       bosses,
       zoom: 0.98,
+      focused: -1,
       music: 'The Hamlet',
       videos,
     };
@@ -66,6 +70,9 @@ createApp({
     round() {
       this.saveGame();
     },
+    music() {
+      this.saveGame();
+    },
   },
 
   computed: {
@@ -76,7 +83,7 @@ createApp({
       return 4 - this.numberSpawned;
     },
     opened() {
-      return this.editingConditions || this.spawning || this.spawningBoss || this.editingDeck;
+      return this.editingConditions || this.spawning || this.spawningBoss || this.editingDeck || this.focused > -1;
     },
     zoneMonsters() {
       const monsters = { ...zones[this.zone], ...common };
@@ -102,6 +109,7 @@ createApp({
         zone: this.zone,
         act: this.act,
         round: this.round,
+        music: this.music,
       };
     },
   },
@@ -173,8 +181,9 @@ createApp({
         this.round += 1;
         this.monsters.forEach((m) => (m.turns = allMonsters[m.name].actions || 1));
 
-        // update baron actions
-        this.monsters.filter((m) => m.name.startsWith('baron')).forEach((m) => (m.turns = 5 - this.monsters.length));
+        this.monsters
+          .filter((m) => m.name.startsWith('baron') || m.name == 'ancestor_1st_form')
+          .forEach((m) => (m.turns = 5 - this.monsters.length));
         return this.nextTurn();
       }
       this.startTurn(index);
@@ -207,6 +216,11 @@ createApp({
       this.monsters[i].wounds = this.clamp(this.monsters[i].wounds + x);
     },
     kill(i) {
+      if (this.monsters[i].turns) {
+        this.monsters
+          .filter((m) => m.name.startsWith('baron') || m.name == 'ancestor_1st_form')
+          .forEach((m) => (m.turns += 1));
+      }
       this.monsters.splice(i, 1);
       if (!this.monsters.length) this.round = 1;
     },
@@ -271,8 +285,12 @@ createApp({
         this.monsters.push(this.monsterInfo(name));
         this.deck.forEach((x) => (x.spawned += x.name === name ? 1 : 0));
 
-        // update baron actions
-        this.monsters.filter((m) => m.name.startsWith('baron')).forEach((m) => (m.turns = this.clamp(m.turns - 1)));
+        this.monsters
+          .filter((m) => m.name.startsWith('baron'))
+          .forEach((m) => {
+            if (m.turns == 0) this.monsters.at(-1).turns = 0;
+            m.turns = this.clamp(m.turns - 1);
+          });
       }
       this.closeModal();
     },
@@ -288,7 +306,17 @@ createApp({
       return monsters[(Math.random() * (monsters.length - 1)) | 0];
     },
     spawnBoss() {
-      this.monsters.push(this.monsterInfo(this.monster));
+      if (this.numberSpawned + (allMonsters[this.boss].large ? 2 : 1) <= 4) {
+        this.monsters.push(this.monsterInfo(this.boss));
+
+        if (this.boss != 'ancestor_1st_form')
+          this.monsters
+            .filter((m) => m.name == 'ancestor_1st_form')
+            .forEach((m) => {
+              if (m.turns == 0) this.monsters.at(-1).turns = 0;
+              m.turns = this.clamp(m.turns - 1);
+            });
+      }
     },
 
     setUp() {
@@ -324,44 +352,29 @@ createApp({
       this.spawning = false;
       this.spawningBoss = false;
       this.editingDeck = false;
-      this.monster = '';
+      this.focused = -1;
     },
+
     saveGame() {
       localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(this.save));
     },
     loadGame() {
       const save = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY));
       if (save) {
-        this.load(save);
+        this.monsters = save.monsters;
+        this.deck = save.deck;
+        this.zone = save.zone;
+        this.act = save.act;
+        this.round = save.round;
+        this.music = save.music;
       }
     },
-    exportSave() {
-      const save = JSON.stringify(this.save, null, 2);
-      const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(save);
-      const dlAnchorElem = document.getElementById('export');
-      dlAnchorElem.setAttribute('href', dataStr);
-      dlAnchorElem.setAttribute('download', `${LOCAL_STORAGE_KEY}.json`);
-      dlAnchorElem.click();
-    },
-    importSave() {
-      document.getElementById('import').click();
-    },
-    onFileUpload(event) {
-      if (!event.target.files[0]) return;
-
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const save = JSON.parse(event.target.result);
-        this.load(save);
-      };
-      reader.readAsText(event.target.files[0]);
-    },
-    load(save) {
-      this.monsters = save.monsters;
-      this.deck = save.deck;
-      this.zone = save.zone;
-      this.act = save.act;
-      this.round = save.round;
-    },
   },
-}).mount('#app');
+});
+
+// reset on error
+app.config.errorHandler = (err) => {
+  localStorage.removeItem(LOCAL_STORAGE_KEY);
+  console.log(err);
+};
+app.mount('#app');

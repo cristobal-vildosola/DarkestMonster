@@ -13,7 +13,3 @@ const darkest_dungeon = {
   antibody: { level: 3, copies: 3, front: false, large: false, index: 13, ...darkestS },
   defensive_growth: { level: 3, copies: 3, front: false, large: false, index: 16, ...darkestS },
 };
-
-const darkestBosses = {
-  ascended_brawler: { level: 3, copies: 3, front: true, large: false, index: 19, ...darkestS },
-};
