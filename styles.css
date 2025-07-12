@@ -303,22 +303,28 @@ main > * {
   align-items: center;
   justify-content: space-around;
   text-align: center;
-}
-.deck div {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-}
-.deck button {
-  margin-bottom: var(--unit);
-}
-.deck .danger {
-  background: darkred;
-  border-radius: calc(2 * var(--unit));
-  animation-name: danger;
-  animation-duration: 2s;
-  animation-iteration-count: infinite;
-  animation-timing-function: ease-in-out;
+
+  > div {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+
+    > *:not(:last-child) {
+      margin-bottom: var(--unit);
+    }
+  }
+  .danger {
+    background: darkred;
+    border-radius: calc(2 * var(--unit));
+    animation-name: danger;
+    animation-duration: 2s;
+    animation-iteration-count: infinite;
+    animation-timing-function: ease-in-out;
+  }
+  input {
+    height: calc(2 * var(--unit));
+    width: calc(2 * var(--unit));
+  }
 }
 @keyframes danger {
   0% {

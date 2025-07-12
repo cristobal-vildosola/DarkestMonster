@@ -80,6 +80,11 @@
         <div>
           <button class="text-button" @click="nextTurn()">Next Monster Turn</button>
           <div class="text" :class="{danger: round >= 4}">Round {{round}}</div>
+
+          <div>
+            <input type="checkbox" id="random" v-model="random" />
+            <label for="random">Random initiative</label>
+          </div>
         </div>
       </div>
 
@@ -101,9 +106,7 @@
       </div>
 
       <div class="translations">
-        <div>
-          Click on a card to enlarge it
-        </div>
+        <div>Click on a card to enlarge it</div>
         <div>
           <b>Le plus près</b> :
           <span>Closest</span>
@@ -327,7 +330,12 @@
           </template>
 
           <template v-else-if="focused > -1">
-            <div class="card focused" :style="monsterCard(focused)" :class="{large: allMonsters[monsters[focused].name].large}">
+            <div
+              @click="closeModal()"
+              class="card focused"
+              :style="monsterCard(focused)"
+              :class="{large: allMonsters[monsters[focused].name].large}"
+            ></div>
           </template>
         </div>
       </section>

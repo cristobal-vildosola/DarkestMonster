@@ -20,6 +20,7 @@ const app = createApp({
       zone: 'ruins',
       act: 1,
       round: 1,
+      random: false,
 
       editingConditions: 0,
       condition: '',
@@ -70,6 +71,9 @@ const app = createApp({
     round() {
       this.saveGame();
     },
+    random() {
+      this.saveGame();
+    },
     music() {
       this.saveGame();
     },
@@ -109,6 +113,7 @@ const app = createApp({
         zone: this.zone,
         act: this.act,
         round: this.round,
+        random: this.random,
         music: this.music,
       };
     },
@@ -177,16 +182,30 @@ const app = createApp({
       const index = this.monsters.findIndex((m) => m.turns > 0);
 
       // start next round
-      if (index < 0) {
-        this.round += 1;
-        this.monsters.forEach((m) => (m.turns = allMonsters[m.name].actions || 1));
-
-        this.monsters
-          .filter((m) => m.name.startsWith('baron') || m.name == 'ancestor_1st_form')
-          .forEach((m) => (m.turns = 5 - this.monsters.length));
+      if (this.monsters.findIndex((m) => m.turns > 0) < 0) {
+        this.nextRound();
         return this.nextTurn();
       }
+
+      if (this.random) {
+        return this.randomTurn();
+      }
       this.startTurn(index);
+    },
+    randomTurn() {
+      const n = this.monsters.length;
+      const start = Math.floor(Math.random() * n);
+      const shuffled = this.monsters.slice(start, n).concat(this.monsters.slice(0, start));
+      const index = shuffled.findIndex((m) => m.turns > 0);
+      this.startTurn((index + start) % n);
+    },
+    nextRound() {
+      this.round += 1;
+      this.monsters.forEach((m) => (m.turns = allMonsters[m.name].actions || 1));
+
+      this.monsters
+        .filter((m) => m.name.startsWith('baron') || m.name == 'ancestor_1st_form')
+        .forEach((m) => (m.turns = 5 - this.monsters.length));
     },
     startTurn(i) {
       this.monsters[i].stunned = false;
@@ -204,6 +223,7 @@ const app = createApp({
       this.monsters[i].turns -= 1;
       this.monsters[i].playing = true;
     },
+
     removeCondition(i) {
       this.monsters[this.editingConditions - 1].conditions.splice(i, 1);
     },
@@ -366,6 +386,7 @@ const app = createApp({
         this.zone = save.zone;
         this.act = save.act;
         this.round = save.round;
+        this.random = save.random;
         this.music = save.music;
       }
     },
