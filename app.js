@@ -265,6 +265,11 @@ const app = createApp({
         front = 0,
         lastSpawned = '';
 
+      this.monsters.forEach((m) => {
+        if (allMonsters[m.name].front) front++;
+        else back++;
+      });
+
       while (this.numberSpawned < 4) {
         name = this.randomMonster();
         const monster = this.monsterInfo(name);
@@ -289,7 +294,7 @@ const app = createApp({
           back += 1;
         }
 
-        this.deck.forEach((x) => (x.spawned += x.name === name ? 1 : 0));
+        this.updateSpawned(name);
         if (!allMonsters[name].large) lastSpawned = name;
       }
     },
@@ -303,7 +308,7 @@ const app = createApp({
         }
 
         this.monsters.push(this.monsterInfo(name));
-        this.deck.forEach((x) => (x.spawned += x.name === name ? 1 : 0));
+        this.updateSpawned(name);
 
         this.monsters
           .filter((m) => m.name.startsWith('baron'))
@@ -313,6 +318,11 @@ const app = createApp({
           });
       }
       this.closeModal();
+    },
+    updateSpawned(name) {
+      this.deck.forEach((x) => {
+        if (x.name === name) x.spawned = Math.min(x.spawned + 1, x.copies);
+      });
     },
     randomMonster() {
       const monsters = this.deck.reduce(
