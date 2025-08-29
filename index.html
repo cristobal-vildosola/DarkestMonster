@@ -149,13 +149,15 @@
 
             <div class="text">Select Turns</div>
             <div class="modal-buttons">
-              <template v-for="item in 6">
-                <input type="radio" :id="item" :value="item" v-model="turns" />
-                <label :for="item" class="radio-label condition"> {{item}} </label>
-              </template>
+              <button
+                v-for="item in 6"
+                class="radio-label condition"
+                @click="addCondition(item)"
+                :disabled="condition == ''"
+              >
+                {{item}}
+              </button>
             </div>
-
-            <button class="text-button" @click="addCondition()">Add</button>
 
             <div class="text modal-buttons">
               <hr />

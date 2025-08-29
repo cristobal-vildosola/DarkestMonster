@@ -24,7 +24,6 @@ const app = createApp({
 
       editingConditions: 0,
       condition: '',
-      turns: 0,
 
       spawning: false,
       monster: '',
@@ -155,12 +154,12 @@ const app = createApp({
       return this.format(text).substring(0, text.length - (this.zone == 'darkest_dungeon' ? 0 : 2));
     },
 
-    addCondition() {
+    addCondition(turns) {
       const index = this.editingConditions - 1;
 
       if (['push', 'pull'].includes(this.condition)) {
         const removed = this.monsters.splice(index, 1);
-        const dest = this.clamp(index + (this.condition == 'push' ? this.turns : -this.turns), 0, this.monsters.length);
+        const dest = this.clamp(index + (this.condition == 'push' ? turns : -turns), 0, this.monsters.length);
         this.monsters.splice(dest, 0, ...removed);
         this.editingConditions = dest + 1;
         return;
@@ -168,7 +167,7 @@ const app = createApp({
 
       this.monsters[index].conditions.push({
         condition: this.condition,
-        turns: this.turns,
+        turns: turns,
       });
       this.monsters[index].conditions.sort((a, b) => (a.condition < b.condition ? -1 : 1));
     },
